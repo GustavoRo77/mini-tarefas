@@ -2,9 +2,9 @@
 http://ionicframework.com/docs/theming/ */
 :root {
   --ion-background-color: #bb8508;
-  --ion-text-color: #b31010;
+  --ion-text-color: #090172;
   --ion-color-primary: #3a92ad;
-  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast: #1439a0;
   --ion-font-family: 'Segoe UI', Roboto, sans-serif;
   --border-radius: 10px;
 }
@@ -48,7 +48,7 @@ ion-card {
 }
  
 ion-item {
-  --background: #f80000;
+  --background: #96ddd7;
   --color: #185f80;
   border-bottom: 1px solid #e5e5e5;
 }
