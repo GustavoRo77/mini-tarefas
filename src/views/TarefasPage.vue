@@ -1,82 +1,153 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
+      <ion-buttons slot="start">
+        <ion-back-button default-href="/"></ion-back-button>
+      </ion-buttons>
       <ion-toolbar>
         <ion-title>Tarefas</ion-title>
-        <ion-button @click="router.push('/Home')"> ir para Home </ion-button>
       </ion-toolbar>
     </ion-header>
  
     <ion-content class="ion-padding">
+      <!-- 🔹 ADICIONAR -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Nova tarefa</ion-card-title>
+        </ion-card-header>
  
-      <ion-input
-        v-model="novaTarefa"
-        placeholder="Digite uma tarefa"
-      ></ion-input>
+        <ion-card-content>
+          <ion-item>
+            <ion-input
+              v-model="novaTarefa"
+              placeholder="Digite uma tarefa..."
+            />
+            <ion-button @click="adicionarNova">
+              <ion-icon :icon="add"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
  
-      <!-- BOTÃO -->
-      <ion-button expand="block" color="primary" @click="adicionarTarefa">
-          <ion-icon :icon="addOutline" slot="start"></ion-icon>
-        Adicionar Tarefa
-      </ion-button>
+      <!-- 🔹 BUSCA -->
+      <ion-item>
+        <ion-input v-model="busca" placeholder="Buscar tarefas..." />
+      </ion-item>
  
-      <!-- LISTA -->
-      <ion-list>
+      <!-- 🔹 FILTRO (igual PDF) -->
+      <ion-segment v-model="filtroAtivo">
+        <ion-segment-button value="todas">
+          <ion-label>Todas</ion-label>
+        </ion-segment-button>
  
-        <ion-item v-for="(tarefa, index) in tarefas" :key="index">
-          <ion-label>
-            {{ tarefa }}
-          </ion-label>
+        <ion-segment-button value="pendentes">
+          <ion-label>Pendentes</ion-label>
+        </ion-segment-button>
  
-          <ion-button fill="clear" color="danger" slot="end" @click="removerTarefa(index)">
-           <ion-icon :icon="trash"></ion-icon>
-          </ion-button>
-        </ion-item>
+        <ion-segment-button value="feitas">
+          <ion-label>Feitas</ion-label>
+        </ion-segment-button>
+      </ion-segment>
  
-      </ion-list>
+      <!-- 🔹 LISTA COM COMPONENTE -->
+      <CardTarefa
+        v-for="tarefa in filtradas"
+        :key="tarefa.id"
+        :tarefa="tarefa"
+        @remover="remover"
+        @concluir="concluir"
+      />
  
-      <p v-if="tarefas.length === 0">
-        Nenhuma tarefa cadastrada.
-      </p>
+      <!-- 🔹 STATUS -->
+      <ion-card v-if="filtradas.length === 0">
+        <ion-card-content class="ion-text-center">
+          Nenhuma tarefa encontrada.
+        </ion-card-content>
+      </ion-card>
  
+      <!-- 🔹 CONTADOR -->
+      <ion-text class="contador"> Pendentes: {{ totalPendentes }} </ion-text>
     </ion-content>
   </ion-page>
 </template>
  
 <script setup lang="ts">
-import { ref } from 'vue'
-import { trash } from 'ionicons/icons'
-import { addOutline } from 'ionicons/icons'
+import { ref } from "vue";
+import { add } from "ionicons/icons";
  
 import {
-  IonIcon,
-  IonContent,
-  IonHeader,
   IonPage,
-  IonTitle,
+  IonHeader,
   IonToolbar,
+  IonTitle,
+  IonContent,
   IonInput,
-  IonButton,
-  IonList,
   IonItem,
-  IonLabel
-} from '@ionic/vue'
-import router from '@/router';
+  IonButton,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonSegment,
+  IonSegmentButton,
+  IonLabel,
+  IonText,
+  IonIcon,
+} from "@ionic/vue";
  
-const novaTarefa = ref('')
-const tarefas = ref<string[]>([])
+import CardTarefa from "../components/CardTarefa.vue";
+import { useTarefas } from "../composables/useTarefas";
  
-function adicionarTarefa() {
+const {
+  busca,
+  filtroAtivo,
+  filtradas,
+  totalPendentes,
+  adicionar,
+  remover,
+  concluir,
+} = useTarefas();
  
-  if (novaTarefa.value.trim() === '') return
+const novaTarefa = ref("");
  
-  tarefas.value.push(novaTarefa.value)
- 
-  novaTarefa.value = ''
-}
- 
-function removerTarefa(index: number) {
-  tarefas.value.splice(index, 1)
+function adicionarNova() {
+  adicionar(novaTarefa.value);
+  novaTarefa.value = "";
 }
 </script>
+ 
+<style scoped>
+/* espaçamento geral */
+ion-card {
+  margin-bottom: 16px;
+}
+ 
+/* input + botão alinhado bonito */
+ion-item {
+  --inner-padding-end: 6px;
+}
+ 
+/* segment mais respirável */
+ion-segment {
+  margin: 16px 0;
+}
+ 
+/* contador */
+.contador {
+  display: block;
+  margin-top: 16px;
+  font-size: 14px;
+  opacity: 0.7;
+}
+ 
+/* botão mais clean */
+ion-button {
+  height: 36px;
+}
+ 
+/* centralização fallback */
+.ion-text-center {
+  text-align: center;
+}
+</style>
  
